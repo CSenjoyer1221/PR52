@@ -214,4 +214,100 @@ namespace UniversityManagementSystem
                    string.Join("\n", TeachingCourses.Select(c => $"- {c.Name} ({c.Code})"));
         }
     }
+
+    public class Course
+    {
+        private string _name;
+        private string _code;
+        private int _credits;
+        private int _maxStudents;
+
+        public string Name
+        {
+            get => _name;
+            set => _name = !string.IsNullOrWhiteSpace(value) && value.Length >= 3
+                ? value
+                : throw new ArgumentException("Название курса должно содержать минимум 3 символа");
+        }
+
+        public string Code
+        {
+            get => _code;
+            set => _code = !string.IsNullOrWhiteSpace(value) && value.Length >= 4
+                ? value
+                : throw new ArgumentException("Код курса должен содержать минимум 4 символа");
+        }
+
+        public int Credits
+        {
+            get => _credits;
+            set => _credits = value > 0 && value <= 10
+                ? value
+                : throw new ArgumentException("Кредиты должны быть в диапазоне от 1 до 10");
+        }
+
+        public int MaxStudents
+        {
+            get => _maxStudents;
+            set => _maxStudents = value > 0 && value <= 200
+                ? value
+                : throw new ArgumentException("Максимальное количество студентов должно быть от 1 до 200");
+        }
+
+        public string Description { get; set; }
+        public CourseStatus Status { get; set; }
+        public Professor Professor { get; private set; }
+        public List<Student> EnrolledStudents { get; }
+
+        public Course(string name, string code, int credits, int maxStudents, string description = "")
+        {
+            Name = name;
+            Code = code;
+            Credits = credits;
+            MaxStudents = maxStudents;
+            Description = string.IsNullOrWhiteSpace(description) ? "Описание отсутствует" : description;
+            Status = CourseStatus.Active;
+            EnrolledStudents = new List<Student>();
+        }
+
+        public void AssignProfessor(Professor professor)
+        {
+            Professor = professor ?? throw new ArgumentNullException(nameof(professor), "Преподаватель не может быть null");
+        }
+
+        public void AddStudent(Student student)
+        {
+            if (student == null)
+                throw new ArgumentNullException(nameof(student), "Студент не может быть null");
+
+            if (EnrolledStudents.Contains(student))
+                throw new InvalidOperationException($"Студент уже записан на курс: {Name}");
+
+            if (EnrolledStudents.Count >= MaxStudents)
+                throw new InvalidOperationException($"Курс {Name} заполнен. Максимум студентов: {MaxStudents}");
+
+            EnrolledStudents.Add(student);
+        }
+
+        public string GetFullInfo()
+        {
+            string professorInfo = Professor != null
+                ? $"{Professor.FirstName} {Professor.LastName}"
+                : "Не назначен";
+
+            return $"Курс: {Name} ({Code})\n" +
+                   $"Описание: {Description}\n" +
+                   $"Кредиты: {Credits} | Макс. студентов: {MaxStudents} | Записано: {EnrolledStudents.Count}\n" +
+                   $"Статус: {Status} | Преподаватель: {professorInfo}";
+        }
+
+        public string GetEnrolledStudentsInfo()
+        {
+            if (EnrolledStudents.Count == 0)
+                return "На курс еще никто не записан";
+
+            return $"Студенты курса {Name}:\n" +
+                   string.Join("\n", EnrolledStudents.Select(s => $"- {s.FirstName} {s.LastName} ({s.StudentId})"));
+        }
+    }
 }
