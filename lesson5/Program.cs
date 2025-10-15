@@ -310,4 +310,79 @@ namespace UniversityManagementSystem
                    string.Join("\n", EnrolledStudents.Select(s => $"- {s.FirstName} {s.LastName} ({s.StudentId})"));
         }
     }
+
+    public class UniversityManager
+    {
+        private List<Student> _students;
+        private List<Professor> _professors;
+        private List<Course> _courses;
+        private int _nextStudentId;
+        private int _nextProfessorId;
+
+        public UniversityManager()
+        {
+            _students = new List<Student>();
+            _professors = new List<Professor>();
+            _courses = new List<Course>();
+            _nextStudentId = 1;
+            _nextProfessorId = 1;
+
+            InitializeSampleData();
+        }
+
+        private void InitializeSampleData()
+        {
+            try
+            {
+                // Создаем тестовых преподавателей
+                var prof1 = new Professor(_nextProfessorId++, "Иван", "Петров", 45,
+                    "i.petrov@university.ru", "PROF001", "Компьютерные науки", AcademicDegree.Professor, 80000);
+                var prof2 = new Professor(_nextProfessorId++, "Мария", "Сидорова", 38,
+                    "m.sidorova@university.ru", "PROF002", "Математика", AcademicDegree.Doctor, 70000);
+
+                _professors.Add(prof1);
+                _professors.Add(prof2);
+
+                // Создаем тестовых студентов
+                var student1 = new Student(_nextStudentId++, "Алексей", "Иванов", 20,
+                    "a.ivanov@university.ru", "STU001", "Компьютерные науки", 2, 3.8);
+                var student2 = new Student(_nextStudentId++, "Елена", "Кузнецова", 19,
+                    "e.kuznetsova@university.ru", "STU002", "Математика", 1, 3.9);
+                var student3 = new Student(_nextStudentId++, "Дмитрий", "Смирнов", 21,
+                    "d.smirnov@university.ru", "STU003", "Физика", 3, 3.5);
+
+                _students.Add(student1);
+                _students.Add(student2);
+                _students.Add(student3);
+
+                // Создаем тестовые курсы
+                var course1 = new Course("Программирование на C#", "CS101", 4, 30,
+                    "Основы программирования на языке C#");
+                var course2 = new Course("Линейная алгебра", "MATH201", 3, 25,
+                    "Основы линейной алгебры и матричных вычислений");
+                var course3 = new Course("Общая физика", "PHYS101", 4, 35,
+                    "Основы механики и термодинамики");
+
+                _courses.Add(course1);
+                _courses.Add(course2);
+                _courses.Add(course3);
+
+                // Назначаем преподавателей на курсы
+                prof1.AssignToCourse(course1);
+                prof2.AssignToCourse(course2);
+                prof1.AssignToCourse(course3);
+
+                // Записываем студентов на курсы
+                student1.EnrollInCourse(course1);
+                student1.EnrollInCourse(course2);
+                student2.EnrollInCourse(course2);
+                student3.EnrollInCourse(course1);
+                student3.EnrollInCourse(course3);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при инициализации тестовых данных: {ex.Message}");
+            }
+        }
+    }
 }
