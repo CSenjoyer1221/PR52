@@ -426,5 +426,42 @@ namespace UniversityManagementSystem
         {
             return _students.FirstOrDefault(s => s.StudentId == studentId);
         }
+
+        public void AddProfessor(string firstName, string lastName, int age, string email,
+                               string employeeId, string department, AcademicDegree degree, decimal salary)
+        {
+            try
+            {
+                var professor = new Professor(_nextProfessorId++, firstName, lastName, age, email,
+                    employeeId, department, degree, salary);
+                _professors.Add(professor);
+                Console.WriteLine($"✅ Преподаватель успешно добавлен: {professor.GetFullInfo()}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Ошибка при добавлении преподавателя: {ex.Message}");
+            }
+        }
+
+        public void DisplayAllProfessors()
+        {
+            if (_professors.Count == 0)
+            {
+                Console.WriteLine("📭 В системе нет преподавателей.");
+                return;
+            }
+
+            Console.WriteLine("\n👨‍🏫 === ВСЕ ПРЕПОДАВАТЕЛИ ===");
+            foreach (var professor in _professors)
+            {
+                Console.WriteLine(professor.GetFullInfo());
+            }
+            Console.WriteLine($"📊 Всего преподавателей: {_professors.Count}");
+        }
+
+        public Professor FindProfessorById(int id)
+        {
+            return _professors.FirstOrDefault(p => p.Id == id);
+        }
     }
 }
