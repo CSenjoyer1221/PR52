@@ -384,5 +384,47 @@ namespace UniversityManagementSystem
                 Console.WriteLine($"Ошибка при инициализации тестовых данных: {ex.Message}");
             }
         }
+
+        public void AddStudent(string firstName, string lastName, int age, string email,
+                             string studentId, string major, int yearOfStudy, double gpa = 0.0)
+        {
+            try
+            {
+                var student = new Student(_nextStudentId++, firstName, lastName, age, email,
+                    studentId, major, yearOfStudy, gpa);
+                _students.Add(student);
+                Console.WriteLine($"✅ Студент успешно добавлен: {student.GetFullInfo()}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Ошибка при добавлении студента: {ex.Message}");
+            }
+        }
+
+        public void DisplayAllStudents()
+        {
+            if (_students.Count == 0)
+            {
+                Console.WriteLine("📭 В системе нет студентов.");
+                return;
+            }
+
+            Console.WriteLine("\n🎓 === ВСЕ СТУДЕНТЫ ===");
+            foreach (var student in _students)
+            {
+                Console.WriteLine(student.GetFullInfo());
+            }
+            Console.WriteLine($"📊 Всего студентов: {_students.Count}");
+        }
+
+        public Student FindStudentById(int id)
+        {
+            return _students.FirstOrDefault(s => s.Id == id);
+        }
+
+        public Student FindStudentByStudentId(string studentId)
+        {
+            return _students.FirstOrDefault(s => s.StudentId == studentId);
+        }
     }
 }
