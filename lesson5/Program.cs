@@ -463,5 +463,41 @@ namespace UniversityManagementSystem
         {
             return _professors.FirstOrDefault(p => p.Id == id);
         }
+
+        public void AddCourse(string name, string code, int credits, int maxStudents, string description = "")
+        {
+            try
+            {
+                var course = new Course(name, code, credits, maxStudents, description);
+                _courses.Add(course);
+                Console.WriteLine($"✅ Курс успешно создан: {course.Name} ({course.Code})");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Ошибка при создании курса: {ex.Message}");
+            }
+        }
+
+        public void DisplayAllCourses()
+        {
+            if (_courses.Count == 0)
+            {
+                Console.WriteLine("📭 В системе нет курсов.");
+                return;
+            }
+
+            Console.WriteLine("\n📚 === ВСЕ КУРСЫ ===");
+            foreach (var course in _courses)
+            {
+                Console.WriteLine(course.GetFullInfo());
+                Console.WriteLine("---");
+            }
+            Console.WriteLine($"📊 Всего курсов: {_courses.Count}");
+        }
+
+        public Course FindCourseByCode(string code)
+        {
+            return _courses.FirstOrDefault(c => c.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
