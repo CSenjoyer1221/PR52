@@ -4,12 +4,19 @@ using System.Linq;
 
 namespace UniversityManagementSystem
 {
-    // Перечисление для академических степеней преподавателей
+
     public enum AcademicDegree
     {
         Bachelor,
         Master,
         Doctor,
         Professor
+    }
+
+    public enum CourseStatus
+    {
+        Active,
+        Inactive,
+        Completed
     }
 }
