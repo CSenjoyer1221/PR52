@@ -150,4 +150,68 @@ namespace UniversityManagementSystem
                  string.Join("\n", Courses.Select(c => $"- {c.Name} ({c.Code})"));
         }
     }
+
+    public class Professor : Person
+    {
+        private string _employeeId;
+        private decimal _salary;
+
+        public string EmployeeId
+        {
+            get => _employeeId;
+            set => _employeeId = !string.IsNullOrWhiteSpace(value) && value.Length >= 6
+                ? value
+                : throw new ArgumentException("ID сотрудника должен содержать минимум 6 символов");
+        }
+
+        public decimal Salary
+        {
+            get => _salary;
+            set => _salary = value > 0
+                ? value
+                : throw new ArgumentException("Зарплата должна быть положительной");
+        }
+
+        public AcademicDegree Degree { get; set; }
+        public string Department { get; set; }
+        public List<Course> TeachingCourses { get; }
+
+        public Professor(int id, string firstName, string lastName, int age, string email,
+                        string employeeId, string department, AcademicDegree degree, decimal salary)
+            : base(id, firstName, lastName, age, email)
+        {
+            EmployeeId = employeeId;
+            Department = department;
+            Degree = degree;
+            Salary = salary;
+            TeachingCourses = new List<Course>();
+        }
+
+        public void AssignToCourse(Course course)
+        {
+            if (course == null)
+                throw new ArgumentNullException(nameof(course), "Курс не может быть null");
+
+            if (TeachingCourses.Contains(course))
+                throw new InvalidOperationException($"Преподаватель уже ведет курс: {course.Name}");
+
+            TeachingCourses.Add(course);
+            course.AssignProfessor(this);
+        }
+
+        public override string GetFullInfo()
+        {
+            return base.GetFullInfo() +
+                   $" | ID: {EmployeeId} | Кафедра: {Department} | Степень: {Degree} | Зарплата: {Salary:C}";
+        }
+
+        public string GetTeachingCoursesInfo()
+        {
+            if (TeachingCourses.Count == 0)
+                return "Преподаватель не ведет ни одного курса";
+
+            return $"Курсы преподавателя {FirstName} {LastName}:\n" +
+                   string.Join("\n", TeachingCourses.Select(c => $"- {c.Name} ({c.Code})"));
+        }
+    }
 }
