@@ -85,4 +85,69 @@ namespace UniversityManagementSystem
             return $"{FirstName} {LastName} | Возраст: {Age} | Email: {Email}";
         }
     }
+    public class Student : Person
+    {
+        private string _studentId;
+        private double _gpa;
+
+        public string StudentId
+        {
+            get => _studentId;
+            set => _studentId = !string.IsNullOrWhiteSpace(value) && value.Length >= 6
+                ? value
+                : throw new ArgumentException("ID студента должен содержать минимум 6 символов");
+        }
+
+        public double GPA
+        {
+            get => _gpa;
+            set => _gpa = value >= 0 && value <= 4.0
+                ? value
+                : throw new ArgumentException("GPA должен быть в диапазоне от 0.0 до 4.0");
+        }
+
+        public string Major { get; set; }
+        public int YearOfStudy { get; set; }
+        public List<Course> Courses { get; }
+
+        public Student(int id, string firstName, string lastName, int age, string email,
+                      string studentId, string major, int yearOfStudy, double gpa = 0.0)
+            : base(id, firstName, lastName, age, email)
+        {
+            StudentId = studentId;
+            Major = major;
+            YearOfStudy = yearOfStudy >= 1 && yearOfStudy <= 6
+                ? yearOfStudy
+                : throw new ArgumentException("Год обучения должен быть от 1 до 6");
+            GPA = gpa;
+            Courses = new List<Course>();
+        }
+
+        public void EnrollInCourse(Course course)
+        {
+            if (course == null)
+                throw new ArgumentNullException(nameof(course), "Курс не может быть null");
+
+            if (Courses.Contains(course))
+                throw new InvalidOperationException($"Студент уже записан на курс: {course.Name}");
+
+            Courses.Add(course);
+            course.AddStudent(this);
+        }
+
+        public override string GetFullInfo()
+        {
+            return base.GetFullInfo() +
+                $" | ID: {StudentId} | Специальность: {Major} | Курс: {YearOfStudy} | GPA: {GPA:F2}";
+        }
+
+        public string GetCoursesInfo()
+        {
+            if (Courses.Count == 0)
+                return "Студент не записан ни на один курс";
+
+            return $"Курсы студента {FirstName} {LastName}:\n" +
+                 string.Join("\n", Courses.Select(c => $"- {c.Name} ({c.Code})"));
+        }
+    }
 }
