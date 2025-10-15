@@ -591,5 +591,144 @@ namespace UniversityManagementSystem
 
             Console.WriteLine(professor.GetTeachingCoursesInfo());
         }
+
+        public void DisplayStudentsByMajor(string major)
+        {
+            var students = _students.Where(s => s.Major.Equals(major, StringComparison.OrdinalIgnoreCase))
+                                   .OrderBy(s => s.LastName)
+                                   .ThenBy(s => s.FirstName);
+
+            if (!students.Any())
+            {
+                Console.WriteLine($"Нет студентов на специальности '{major}'");
+                return;
+            }
+
+            Console.WriteLine($"\n=== СТУДЕНТЫ СПЕЦИАЛЬНОСТИ '{major}' ===");
+            foreach (var student in students)
+            {
+                Console.WriteLine(student.GetFullInfo());
+            }
+        }
+
+        public void DisplayProfessorsByDepartment(string department)
+        {
+            var professors = _professors.Where(p => p.Department.Equals(department, StringComparison.OrdinalIgnoreCase))
+                                       .OrderBy(p => p.LastName)
+                                       .ThenBy(p => p.FirstName);
+
+            if (!professors.Any())
+            {
+                Console.WriteLine($"Нет преподавателей на кафедре '{department}'");
+                return;
+            }
+
+            Console.WriteLine($"\n=== ПРЕПОДАВАТЕЛИ КАФЕДРЫ '{department}' ===");
+            foreach (var professor in professors)
+            {
+                Console.WriteLine(professor.GetFullInfo());
+            }
+        }
+
+        public void DisplayCoursesByStatus(CourseStatus status)
+        {
+            var courses = _courses.Where(c => c.Status == status)
+                                 .OrderBy(c => c.Name);
+
+            if (!courses.Any())
+            {
+                Console.WriteLine($"Нет курсов со статусом '{status}'");
+                return;
+            }
+
+            Console.WriteLine($"\n=== КУРСЫ СО СТАТУСОМ '{status}' ===");
+            foreach (var course in courses)
+            {
+                Console.WriteLine(course.GetFullInfo());
+                Console.WriteLine("---");
+            }
+        }
+
+        public void DisplayTopStudents(int count = 5)
+        {
+            var topStudents = _students.Where(s => s.GPA > 0)
+                                      .OrderByDescending(s => s.GPA)
+                                      .Take(count);
+
+            if (!topStudents.Any())
+            {
+                Console.WriteLine("Нет студентов с GPA для формирования рейтинга");
+                return;
+            }
+
+            Console.WriteLine($"\n=== ТОП-{count} СТУДЕНТОВ ПО GPA ===");
+            int rank = 1;
+            foreach (var student in topStudents)
+            {
+                Console.WriteLine($"{rank}. {student.FirstName} {student.LastName} - GPA: {student.GPA:F2} | Специальность: {student.Major}");
+                rank++;
+            }
+        }
+
+        public void DisplayCoursesWithAvailableSlots()
+        {
+            var availableCourses = _courses.Where(c => c.EnrolledStudents.Count < c.MaxStudents && c.Status == CourseStatus.Active)
+                                          .OrderBy(c => c.Name);
+
+            if (!availableCourses.Any())
+            {
+                Console.WriteLine("Нет курсов со свободными местами");
+                return;
+            }
+
+            Console.WriteLine("\n=== КУРСЫ СО СВОБОДНЫМИ МЕСТАМИ ===");
+            foreach (var course in availableCourses)
+            {
+                int availableSlots = course.MaxStudents - course.EnrolledStudents.Count;
+                Console.WriteLine($"{course.Name} ({course.Code}) - Свободно мест: {availableSlots}/{course.MaxStudents}");
+            }
+        }
+
+        public void DisplayStudentStatistics()
+        {
+            if (!_students.Any())
+            {
+                Console.WriteLine("Нет студентов для статистики");
+                return;
+            }
+
+            Console.WriteLine("\n=== СТАТИСТИКА СТУДЕНТОВ ===");
+            Console.WriteLine($"Общее количество студентов: {_students.Count}");
+            Console.WriteLine($"Средний GPA: {_students.Average(s => s.GPA):F2}");
+            Console.WriteLine($"Максимальный GPA: {_students.Max(s => s.GPA):F2}");
+            Console.WriteLine($"Минимальный GPA: {_students.Min(s => s.GPA):F2}");
+
+            var majors = _students.GroupBy(s => s.Major)
+                                 .Select(g => new { Major = g.Key, Count = g.Count() })
+                                 .OrderByDescending(x => x.Count);
+
+            Console.WriteLine("\nРаспределение по специальностям:");
+            foreach (var major in majors)
+            {
+                Console.WriteLine($"  {major.Major}: {major.Count} студентов");
+            }
+        }
+
+        public void DisplayUniversityStatistics()
+        {
+            Console.WriteLine("\n=== СТАТИСТИКА УНИВЕРСИТЕТА ===");
+            Console.WriteLine($"Всего студентов: {_students.Count}");
+            Console.WriteLine($"Всего преподавателей: {_professors.Count}");
+            Console.WriteLine($"Всего курсов: {_courses.Count}");
+            Console.WriteLine($"Активных курсов: {_courses.Count(c => c.Status == CourseStatus.Active)}");
+
+            if (_professors.Any())
+            {
+                Console.WriteLine($"Средняя зарплата преподавателей: {_professors.Average(p => p.Salary):C}");
+            }
+
+            var totalEnrollments = _courses.Sum(c => c.EnrolledStudents.Count);
+            Console.WriteLine($"Всего записей на курсы: {totalEnrollments}");
+        }
     }
 }
