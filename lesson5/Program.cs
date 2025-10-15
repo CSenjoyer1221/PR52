@@ -393,11 +393,11 @@ namespace UniversityManagementSystem
                 var student = new Student(_nextStudentId++, firstName, lastName, age, email,
                     studentId, major, yearOfStudy, gpa);
                 _students.Add(student);
-                Console.WriteLine($"✅ Студент успешно добавлен: {student.GetFullInfo()}");
+                Console.WriteLine($"Студент успешно добавлен: {student.GetFullInfo()}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Ошибка при добавлении студента: {ex.Message}");
+                Console.WriteLine($"Ошибка при добавлении студента: {ex.Message}");
             }
         }
 
@@ -405,16 +405,16 @@ namespace UniversityManagementSystem
         {
             if (_students.Count == 0)
             {
-                Console.WriteLine("📭 В системе нет студентов.");
+                Console.WriteLine("В системе нет студентов.");
                 return;
             }
 
-            Console.WriteLine("\n🎓 === ВСЕ СТУДЕНТЫ ===");
+            Console.WriteLine("\n=== ВСЕ СТУДЕНТЫ ===");
             foreach (var student in _students)
             {
                 Console.WriteLine(student.GetFullInfo());
             }
-            Console.WriteLine($"📊 Всего студентов: {_students.Count}");
+            Console.WriteLine($"Всего студентов: {_students.Count}");
         }
 
         public Student FindStudentById(int id)
@@ -435,11 +435,11 @@ namespace UniversityManagementSystem
                 var professor = new Professor(_nextProfessorId++, firstName, lastName, age, email,
                     employeeId, department, degree, salary);
                 _professors.Add(professor);
-                Console.WriteLine($"✅ Преподаватель успешно добавлен: {professor.GetFullInfo()}");
+                Console.WriteLine($"Преподаватель успешно добавлен: {professor.GetFullInfo()}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Ошибка при добавлении преподавателя: {ex.Message}");
+                Console.WriteLine($"Ошибка при добавлении преподавателя: {ex.Message}");
             }
         }
 
@@ -447,16 +447,16 @@ namespace UniversityManagementSystem
         {
             if (_professors.Count == 0)
             {
-                Console.WriteLine("📭 В системе нет преподавателей.");
+                Console.WriteLine("В системе нет преподавателей.");
                 return;
             }
 
-            Console.WriteLine("\n👨‍🏫 === ВСЕ ПРЕПОДАВАТЕЛИ ===");
+            Console.WriteLine("\n=== ВСЕ ПРЕПОДАВАТЕЛИ ===");
             foreach (var professor in _professors)
             {
                 Console.WriteLine(professor.GetFullInfo());
             }
-            Console.WriteLine($"📊 Всего преподавателей: {_professors.Count}");
+            Console.WriteLine($"Всего преподавателей: {_professors.Count}");
         }
 
         public Professor FindProfessorById(int id)
@@ -470,11 +470,11 @@ namespace UniversityManagementSystem
             {
                 var course = new Course(name, code, credits, maxStudents, description);
                 _courses.Add(course);
-                Console.WriteLine($"✅ Курс успешно создан: {course.Name} ({course.Code})");
+                Console.WriteLine($"Курс успешно создан: {course.Name} ({course.Code})");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Ошибка при создании курса: {ex.Message}");
+                Console.WriteLine($"Ошибка при создании курса: {ex.Message}");
             }
         }
 
@@ -482,22 +482,114 @@ namespace UniversityManagementSystem
         {
             if (_courses.Count == 0)
             {
-                Console.WriteLine("📭 В системе нет курсов.");
+                Console.WriteLine("В системе нет курсов.");
                 return;
             }
 
-            Console.WriteLine("\n📚 === ВСЕ КУРСЫ ===");
+            Console.WriteLine("\n=== ВСЕ КУРСЫ ===");
             foreach (var course in _courses)
             {
                 Console.WriteLine(course.GetFullInfo());
                 Console.WriteLine("---");
             }
-            Console.WriteLine($"📊 Всего курсов: {_courses.Count}");
+            Console.WriteLine($"Всего курсов: {_courses.Count}");
         }
 
         public Course FindCourseByCode(string code)
         {
             return _courses.FirstOrDefault(c => c.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public void EnrollStudentInCourse(int studentId, string courseCode)
+        {
+            try
+            {
+                var student = FindStudentById(studentId);
+                var course = FindCourseByCode(courseCode);
+
+                if (student == null)
+                {
+                    Console.WriteLine("Студент не найден.");
+                    return;
+                }
+
+                if (course == null)
+                {
+                    Console.WriteLine("Курс не найден.");
+                    return;
+                }
+
+                student.EnrollInCourse(course);
+                Console.WriteLine($"Студент {student.FirstName} {student.LastName} успешно записан на курс {course.Name}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при записи на курс: {ex.Message}");
+            }
+        }
+
+        public void AssignProfessorToCourse(int professorId, string courseCode)
+        {
+            try
+            {
+                var professor = FindProfessorById(professorId);
+                var course = FindCourseByCode(courseCode);
+
+                if (professor == null)
+                {
+                    Console.WriteLine("Преподаватель не найден.");
+                    return;
+                }
+
+                if (course == null)
+                {
+                    Console.WriteLine("Курс не найден.");
+                    return;
+                }
+
+                professor.AssignToCourse(course);
+                Console.WriteLine($"Преподаватель {professor.FirstName} {professor.LastName} назначен на курс {course.Name}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при назначении преподавателя: {ex.Message}");
+            }
+        }
+
+        public void DisplayStudentCourses(int studentId)
+        {
+            var student = FindStudentById(studentId);
+            if (student == null)
+            {
+                Console.WriteLine("Студент не найден.");
+                return;
+            }
+
+            Console.WriteLine(student.GetCoursesInfo());
+        }
+
+        public void DisplayCourseStudents(string courseCode)
+        {
+            var course = FindCourseByCode(courseCode);
+            if (course == null)
+            {
+                Console.WriteLine("Курс не найден.");
+                return;
+            }
+
+            Console.WriteLine(course.GetEnrolledStudentsInfo());
+        }
+
+        public void DisplayProfessorCourses(int professorId)
+        {
+            var professor = FindProfessorById(professorId);
+            if (professor == null)
+            {
+                Console.WriteLine("Преподаватель не найден.");
+                return;
+            }
+
+            Console.WriteLine(professor.GetTeachingCoursesInfo());
         }
     }
 }
