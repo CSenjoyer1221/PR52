@@ -731,4 +731,551 @@ namespace UniversityManagementSystem
             Console.WriteLine($"Всего записей на курсы: {totalEnrollments}");
         }
     }
+
+    class Program
+    {
+        private static UniversityManager _universityManager;
+
+        static void Main(string[] args)
+        {
+            _universityManager = new UniversityManager();
+            DisplayWelcomeMessage();
+            MainMenu();
+        }
+
+        static void DisplayWelcomeMessage()
+        {
+            Console.WriteLine("====================================");
+            Console.WriteLine("СИСТЕМА УПРАВЛЕНИЯ УНИВЕРСИТЕТОМ");
+            Console.WriteLine("====================================\n");
+            Console.WriteLine("Добро пожаловать! Система загружена с тестовыми данными.\n");
+        }
+
+        static void MainMenu()
+        {
+            while (true)
+            {
+                Console.WriteLine("\n=== ГЛАВНОЕ МЕНЮ ===");
+                Console.WriteLine("1. Управление студентами");
+                Console.WriteLine("2. Управление преподавателями");
+                Console.WriteLine("3. Управление курсами");
+                Console.WriteLine("4. Операции");
+                Console.WriteLine("5. Просмотр всех данных");
+                Console.WriteLine("6. Статистика и аналитика");
+                Console.WriteLine("0. Выход");
+                Console.Write("Выберите опцию: ");
+
+                var choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "1":
+                        StudentMenu();
+                        break;
+                    case "2":
+                        ProfessorMenu();
+                        break;
+                    case "3":
+                        CourseMenu();
+                        break;
+                    case "4":
+                        OperationsMenu();
+                        break;
+                    case "5":
+                        DisplayAllDataMenu();
+                        break;
+                    case "6":
+                        StatisticsMenu();
+                        break;
+                    case "0":
+                        Console.WriteLine("До свидания!");
+                        return;
+                    default:
+                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        break;
+                }
+            }
+        }
+
+        static void StudentMenu()
+        {
+            while (true)
+            {
+                Console.WriteLine("\n=== УПРАВЛЕНИЕ СТУДЕНТАМИ ===");
+                Console.WriteLine("1. Добавить студента");
+                Console.WriteLine("2. Просмотреть всех студентов");
+                Console.WriteLine("3. Найти студента по ID");
+                Console.WriteLine("4. Просмотреть курсы студента");
+                Console.WriteLine("5. Студенты по специальности");
+                Console.WriteLine("0. Назад");
+                Console.Write("Выберите опцию: ");
+
+                var choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "1":
+                        AddStudent();
+                        break;
+                    case "2":
+                        _universityManager.DisplayAllStudents();
+                        break;
+                    case "3":
+                        FindStudentById();
+                        break;
+                    case "4":
+                        DisplayStudentCourses();
+                        break;
+                    case "5":
+                        DisplayStudentsByMajor();
+                        break;
+                    case "0":
+                        return;
+                    default:
+                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        break;
+                }
+            }
+        }
+
+        static void AddStudent()
+        {
+            try
+            {
+                Console.WriteLine("\n--- Добавление нового студента ---");
+
+                Console.Write("Имя: ");
+                var firstName = Console.ReadLine();
+
+                Console.Write("Фамилия: ");
+                var lastName = Console.ReadLine();
+
+                Console.Write("Возраст: ");
+                if (!int.TryParse(Console.ReadLine(), out int age))
+                {
+                    Console.WriteLine("Некорректный возраст.");
+                    return;
+                }
+
+                Console.Write("Email: ");
+                var email = Console.ReadLine();
+
+                Console.Write("ID студента: ");
+                var studentId = Console.ReadLine();
+
+                Console.Write("Специальность: ");
+                var major = Console.ReadLine();
+
+                Console.Write("Год обучения: ");
+                if (!int.TryParse(Console.ReadLine(), out int yearOfStudy))
+                {
+                    Console.WriteLine("Некорректный год обучения.");
+                    return;
+                }
+
+                Console.Write("GPA (по умолчанию 0.0): ");
+                var gpaInput = Console.ReadLine();
+                double gpa = 0.0;
+                if (!string.IsNullOrWhiteSpace(gpaInput) && !double.TryParse(gpaInput, out gpa))
+                {
+                    Console.WriteLine("Некорректный GPA. Использовано значение по умолчанию 0.0");
+                }
+
+                _universityManager.AddStudent(firstName, lastName, age, email, studentId, major, yearOfStudy, gpa);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка: {ex.Message}");
+            }
+        }
+
+        static void FindStudentById()
+        {
+            Console.Write("Введите ID студента: ");
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                var student = _universityManager.FindStudentById(id);
+                if (student != null)
+                {
+                    Console.WriteLine($"Найден студент: {student.GetFullInfo()}");
+                }
+                else
+                {
+                    Console.WriteLine("Студент с таким ID не найден.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Некорректный ID.");
+            }
+        }
+
+        static void DisplayStudentCourses()
+        {
+            Console.Write("Введите ID студента: ");
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                _universityManager.DisplayStudentCourses(id);
+            }
+            else
+            {
+                Console.WriteLine("Некорректный ID.");
+            }
+        }
+
+        static void DisplayStudentsByMajor()
+        {
+            Console.Write("Введите специальность: ");
+            var major = Console.ReadLine();
+            _universityManager.DisplayStudentsByMajor(major);
+        }
+
+        static void ProfessorMenu()
+        {
+            while (true)
+            {
+                Console.WriteLine("\n=== УПРАВЛЕНИЕ ПРЕПОДАВАТЕЛЯМИ ===");
+                Console.WriteLine("1. Добавить преподавателя");
+                Console.WriteLine("2. Просмотреть всех преподавателей");
+                Console.WriteLine("3. Найти преподавателя по ID");
+                Console.WriteLine("4. Просмотреть курсы преподавателя");
+                Console.WriteLine("5. Преподаватели по кафедре");
+                Console.WriteLine("0. Назад");
+                Console.Write("Выберите опцию: ");
+
+                var choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "1":
+                        AddProfessor();
+                        break;
+                    case "2":
+                        _universityManager.DisplayAllProfessors();
+                        break;
+                    case "3":
+                        FindProfessorById();
+                        break;
+                    case "4":
+                        DisplayProfessorCourses();
+                        break;
+                    case "5":
+                        DisplayProfessorsByDepartment();
+                        break;
+                    case "0":
+                        return;
+                    default:
+                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        break;
+                }
+            }
+        }
+
+        static void AddProfessor()
+        {
+            try
+            {
+                Console.WriteLine("\n--- Добавление нового преподавателя ---");
+
+                Console.Write("Имя: ");
+                var firstName = Console.ReadLine();
+
+                Console.Write("Фамилия: ");
+                var lastName = Console.ReadLine();
+
+                Console.Write("Возраст: ");
+                if (!int.TryParse(Console.ReadLine(), out int age))
+                {
+                    Console.WriteLine("Некорректный возраст.");
+                    return;
+                }
+
+                Console.Write("Email: ");
+                var email = Console.ReadLine();
+
+                Console.Write("ID сотрудника: ");
+                var employeeId = Console.ReadLine();
+
+                Console.Write("Кафедра: ");
+                var department = Console.ReadLine();
+
+                Console.WriteLine("Академическая степень:");
+                Console.WriteLine("1. Бакалавр");
+                Console.WriteLine("2. Магистр");
+                Console.WriteLine("3. Доктор");
+                Console.WriteLine("4. Профессор");
+                Console.Write("Выберите степень (1-4): ");
+                var degreeChoice = Console.ReadLine();
+
+                AcademicDegree degree = degreeChoice switch
+                {
+                    "1" => AcademicDegree.Bachelor,
+                    "2" => AcademicDegree.Master,
+                    "3" => AcademicDegree.Doctor,
+                    "4" => AcademicDegree.Professor,
+                    _ => AcademicDegree.Bachelor
+                };
+
+                Console.Write("Зарплата: ");
+                if (!decimal.TryParse(Console.ReadLine(), out decimal salary))
+                {
+                    Console.WriteLine("Некорректная зарплата.");
+                    return;
+                }
+
+                _universityManager.AddProfessor(firstName, lastName, age, email, employeeId, department, degree, salary);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка: {ex.Message}");
+            }
+        }
+
+        static void FindProfessorById()
+        {
+            Console.Write("Введите ID преподавателя: ");
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                var professor = _universityManager.FindProfessorById(id);
+                if (professor != null)
+                {
+                    Console.WriteLine($"Найден преподаватель: {professor.GetFullInfo()}");
+                }
+                else
+                {
+                    Console.WriteLine("Преподаватель с таким ID не найден.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Некорректный ID.");
+            }
+        }
+
+        static void DisplayProfessorCourses()
+        {
+            Console.Write("Введите ID преподавателя: ");
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                _universityManager.DisplayProfessorCourses(id);
+            }
+            else
+            {
+                Console.WriteLine("Некорректный ID.");
+            }
+        }
+
+        static void DisplayProfessorsByDepartment()
+        {
+            Console.Write("Введите название кафедры: ");
+            var department = Console.ReadLine();
+            _universityManager.DisplayProfessorsByDepartment(department);
+        }
+
+        static void CourseMenu()
+        {
+            while (true)
+            {
+                Console.WriteLine("\n=== УПРАВЛЕНИЕ КУРСАМИ ===");
+                Console.WriteLine("1. Создать курс");
+                Console.WriteLine("2. Просмотреть все курсы");
+                Console.WriteLine("3. Найти курс по коду");
+                Console.WriteLine("4. Просмотреть студентов курса");
+                Console.WriteLine("5. Курсы со свободными местами");
+                Console.WriteLine("0. Назад");
+                Console.Write("Выберите опцию: ");
+
+                var choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "1":
+                        AddCourse();
+                        break;
+                    case "2":
+                        _universityManager.DisplayAllCourses();
+                        break;
+                    case "3":
+                        FindCourseByCode();
+                        break;
+                    case "4":
+                        DisplayCourseStudents();
+                        break;
+                    case "5":
+                        _universityManager.DisplayCoursesWithAvailableSlots();
+                        break;
+                    case "0":
+                        return;
+                    default:
+                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        break;
+                }
+            }
+        }
+
+        static void AddCourse()
+        {
+            try
+            {
+                Console.WriteLine("\n--- Создание нового курса ---");
+
+                Console.Write("Название курса: ");
+                var name = Console.ReadLine();
+
+                Console.Write("Код курса: ");
+                var code = Console.ReadLine();
+
+                Console.Write("Количество кредитов: ");
+                if (!int.TryParse(Console.ReadLine(), out int credits))
+                {
+                    Console.WriteLine("Некорректное количество кредитов.");
+                    return;
+                }
+
+                Console.Write("Максимальное количество студентов: ");
+                if (!int.TryParse(Console.ReadLine(), out int maxStudents))
+                {
+                    Console.WriteLine("Некорректное количество студентов.");
+                    return;
+                }
+
+                Console.Write("Описание (опционально): ");
+                var description = Console.ReadLine();
+
+                _universityManager.AddCourse(name, code, credits, maxStudents, description);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка: {ex.Message}");
+            }
+        }
+
+        static void FindCourseByCode()
+        {
+            Console.Write("Введите код курса: ");
+            var code = Console.ReadLine();
+            var course = _universityManager.FindCourseByCode(code);
+            if (course != null)
+            {
+                Console.WriteLine(course.GetFullInfo());
+            }
+            else
+            {
+                Console.WriteLine("Курс с таким кодом не найден.");
+            }
+        }
+
+        static void DisplayCourseStudents()
+        {
+            Console.Write("Введите код курса: ");
+            var code = Console.ReadLine();
+            _universityManager.DisplayCourseStudents(code);
+        }
+
+        static void OperationsMenu()
+        {
+            while (true)
+            {
+                Console.WriteLine("\n=== ОПЕРАЦИИ ===");
+                Console.WriteLine("1. Записать студента на курс");
+                Console.WriteLine("2. Назначить преподавателя на курс");
+                Console.WriteLine("0. Назад");
+                Console.Write("Выберите опцию: ");
+
+                var choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "1":
+                        EnrollStudentInCourse();
+                        break;
+                    case "2":
+                        AssignProfessorToCourse();
+                        break;
+                    case "0":
+                        return;
+                    default:
+                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        break;
+                }
+            }
+        }
+
+        static void EnrollStudentInCourse()
+        {
+            Console.Write("Введите ID студента: ");
+            if (!int.TryParse(Console.ReadLine(), out int studentId))
+            {
+                Console.WriteLine("Некорректный ID студента.");
+                return;
+            }
+
+            Console.Write("Введите код курса: ");
+            var courseCode = Console.ReadLine();
+
+            _universityManager.EnrollStudentInCourse(studentId, courseCode);
+        }
+
+        static void AssignProfessorToCourse()
+        {
+            Console.Write("Введите ID преподавателя: ");
+            if (!int.TryParse(Console.ReadLine(), out int professorId))
+            {
+                Console.WriteLine("Некорректный ID преподавателя.");
+                return;
+            }
+
+            Console.Write("Введите код курса: ");
+            var courseCode = Console.ReadLine();
+
+            _universityManager.AssignProfessorToCourse(professorId, courseCode);
+        }
+
+        static void DisplayAllDataMenu()
+        {
+            Console.WriteLine("\n=== ВСЕ ДАННЫЕ СИСТЕМЫ ===");
+            _universityManager.DisplayAllStudents();
+            _universityManager.DisplayAllProfessors();
+            _universityManager.DisplayAllCourses();
+        }
+
+        static void StatisticsMenu()
+        {
+            while (true)
+            {
+                Console.WriteLine("\n=== СТАТИСТИКА И АНАЛИТИКА ===");
+                Console.WriteLine("1. Топ студентов по GPA");
+                Console.WriteLine("2. Статистика студентов");
+                Console.WriteLine("3. Общая статистика университета");
+                Console.WriteLine("4. Курсы со свободными местами");
+                Console.WriteLine("0. Назад");
+                Console.Write("Выберите опцию: ");
+
+                var choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "1":
+                        Console.Write("Количество студентов в топе (по умолчанию 5): ");
+                        if (int.TryParse(Console.ReadLine(), out int count) && count > 0)
+                        {
+                            _universityManager.DisplayTopStudents(count);
+                        }
+                        else
+                        {
+                            _universityManager.DisplayTopStudents();
+                        }
+                        break;
+                    case "2":
+                        _universityManager.DisplayStudentStatistics();
+                        break;
+                    case "3":
+                        _universityManager.DisplayUniversityStatistics();
+                        break;
+                    case "4":
+                        _universityManager.DisplayCoursesWithAvailableSlots();
+                        break;
+                    case "0":
+                        return;
+                    default:
+                        Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                        break;
+                }
+            }
+        }
+    }
 }
